@@ -11,13 +11,22 @@ const userSchema = new mongoose.Schema({
         lowercase: true
     },
     password: {
-        type: string
-    },
-    isVerifiedByGoogle: {
-        type: Boolean,
-        default: false
+        type: String
     },
     country: {
         type: String
-    }
-})
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+    googleId: {
+        type: String,
+    },
+    avatar: {
+        type: String
+    },
+}, {timestamps: true})
+
+const User = mongoose.model("User", userSchema)
+module.exports = {User}
