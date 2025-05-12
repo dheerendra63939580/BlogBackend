@@ -3,7 +3,8 @@ const {User} = require("../models/userSchema")
 const createBlog = async (req, res) => {
     console.log("hit blog")
     try {
-        const {userId, content} = req.body;
+        const userId = req.userId
+        const {content} = req.body;
         const user = await User.findById(userId);
         if(!user)
             return res.status(400).json({
@@ -14,7 +15,7 @@ const createBlog = async (req, res) => {
             userId,
             content
         });
-        user.posts.push(blog._id);
+        user.blogs.push(blog._id);
         await user.save()
         res.status(201).json({
             success: true,
