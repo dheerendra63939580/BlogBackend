@@ -29,7 +29,7 @@ const signInByGoogle = async (req, res) => {
             name: userData.name,
             email: userData.email,
             googleId: userData.sub,
-            avatar: userData.image,
+            avatar: userData.picture,
             isVerified: true,
 
         })
@@ -47,6 +47,29 @@ const signInByGoogle = async (req, res) => {
     }
 }
 
+const getProfile = async (req, res) => {
+    console.log(req.userId)
+    try {
+        const user = await User.findById(req.userId).select("name avatar");
+        if(!user)
+            return res.status(400).json({
+                success: false,
+                message: "User not found"
+        });
+        return res.status(200).json({
+            success: true, 
+            data: user,
+            message: "Profile found successfully"
+        })
+    } catch(err) {
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        })
+    }
+}
+
 module.exports = {
     signInByGoogle,
+    getProfile
 }
