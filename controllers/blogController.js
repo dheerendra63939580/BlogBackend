@@ -29,6 +29,24 @@ const createBlog = async (req, res) => {
     }
 }
 
+const getBlogs = async (req, res) => {
+    try {
+         const blogs = await Blog.find({}).populate("userId", "name createdAt updatedAt");
+         res.status(200).json({
+            success: true, 
+            data: {blogs},
+            message: "Blogs found successfully"
+         })
+
+    } catch(err) {
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        })
+    }
+}
+
 module.exports = {
-    createBlog
+    createBlog,
+    getBlogs
 }
