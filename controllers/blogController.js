@@ -4,7 +4,7 @@ const createBlog = async (req, res) => {
     console.log("hit blog")
     try {
         const userId = req.userId
-        const {content} = req.body;
+        const {title, content} = req.body;
         const user = await User.findById(userId);
         if(!user)
             return res.status(400).json({
@@ -13,6 +13,7 @@ const createBlog = async (req, res) => {
         })
         const blog = await Blog.create({
             userId,
+            title,
             content
         });
         user.blogs.push(blog._id);
@@ -31,7 +32,9 @@ const createBlog = async (req, res) => {
 
 const getBlogs = async (req, res) => {
     try {
-         const blogs = await Blog.find({}).populate("userId", "name createdAt updatedAt");
+         const blogs = await Blog.find({})
+         .select("-content")
+         .populate("userId", "name createdAt updatedAt avatar");
          res.status(200).json({
             success: true, 
             data: {blogs},
