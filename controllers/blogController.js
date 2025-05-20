@@ -34,7 +34,7 @@ const getBlogs = async (req, res) => {
     try {
          const blogs = await Blog.find({})
          .select("-content")
-         .populate("userId", "name createdAt updatedAt avatar");
+         .populate("userId", "name createdAt updatedAt avatar -_id");
          res.status(200).json({
             success: true, 
             data: {blogs},
