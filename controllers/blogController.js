@@ -1,7 +1,6 @@
 const {Blog} = require("../models/blogSchema")
 const {User} = require("../models/userSchema")
 const createBlog = async (req, res) => {
-    console.log("hit blog")
     try {
         const userId = req.userId
         const {title, content} = req.body;
@@ -49,7 +48,30 @@ const getBlogs = async (req, res) => {
     }
 }
 
+const getBlogById = async (req, res) => {
+    try {
+        const { blogId } = req.params;
+        const blog = await Blog.findById(blogId).populate("userId", "name createdAt updatedAt avatar -_id");
+        if(!blog)
+            return res.status(400).json({
+                success: false, 
+                message: "Blog not found"
+            })
+        return res.status(200).json({
+            success: true,
+            message: "Blog found successfully",
+            data: blog
+        })
+    } catch(err) {
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        })
+    }
+}
+
 module.exports = {
     createBlog,
-    getBlogs
+    getBlogs,
+    getBlogById,
 }
