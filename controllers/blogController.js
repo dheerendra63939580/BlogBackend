@@ -1,5 +1,7 @@
 const {Blog} = require("../models/blogSchema")
-const {User} = require("../models/userSchema")
+const {User} = require("../models/userSchema");
+const { extractUserId } = require("../utils/extractUserId");
+const mongoose = require("mongoose");
 const createBlog = async (req, res) => {
     try {
         const userId = req.userId
@@ -49,27 +51,87 @@ const getBlogs = async (req, res) => {
 }
 
 const getBlogById = async (req, res) => {
-    try {
-        const { blogId, wantOnlyUserId } = req.params;
-        let fieldsToPopulate = wantOnlyUserId === "true" ? "_id" : "name createdAt updatedAt avatar _id";
-        const blog = await Blog.findById(blogId).select("title likes content createdAt updatedAt").populate("userId", fieldsToPopulate);
-        if(!blog)
-            return res.status(400).json({
-                success: false, 
-                message: "Blog not found"
-            })
-        return res.status(200).json({
-            success: true,
-            message: "Blog found successfully",
-            data: blog
-        })
-    } catch(err) {
-        res.status(500).json({
-            success: false,
-            message: "Internal server error"
-        })
+  try {
+    const token = req.headers.authorization?.split(" ")?.[1];
+    console.log("api hit")
+    const userId = extractUserId(token); // assumed to return a string
+    console.log("userId", userId)
+    const { blogId, wantOnlyUserId } = req.params;
+    const blogIdObj = new mongoose.Types.ObjectId(blogId);
+   let userIdObj = null;
+   try {
+     userIdObj = mongoose.Types.ObjectId(userId);
+   } catch {
+     userIdObj = null;
+   }
+
+    const fieldsToProject =
+      wantOnlyUserId === "true"
+        ? { _id: "$userInfo._id" }
+        : {
+            _id: "$userInfo._id",
+            name: "$userInfo.name",
+            avatar: "$userInfo.avatar",
+            createdAt: "$userInfo.createdAt",
+            updatedAt: "$userInfo.updatedAt",
+          };
+
+    const result = await Blog.aggregate([
+      { $match: { _id: blogIdObj } },
+      {
+        $addFields: {
+          likesCount: { $size: "$likes" },
+          hasUserLiked: {
+            $cond: [
+              { $eq: [userIdObj, null] }, // if no userId
+              false,
+              { $in: [userIdObj, "$likes"] },
+            ],
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "userInfo",
+        },
+      },
+      { $unwind: "$userInfo" },
+      {
+        $project: {
+          title: 1,
+          content: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          likesCount: 1,
+          hasUserLiked: 1,
+          user: fieldsToProject,
+        },
+      },
+    ]);
+
+    if (!result.length) {
+      return res.status(400).json({
+        success: false,
+        message: "Blog not found",
+      });
     }
-}
+
+    return res.status(200).json({
+      success: true,
+      message: "Blog found successfully",
+      data: result[0],
+    });
+  } catch (err) {
+    console.log(err)
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
 
 const updateBlog = async (req, res) => {
     try {
