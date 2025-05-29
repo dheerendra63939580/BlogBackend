@@ -36,13 +36,20 @@ const getBlogs = async (req, res) => {
          const blogs = await Blog.find({})
          .select("-content")
          .populate("userId", "name createdAt updatedAt avatar _id");
+         const blogWithLikes = blogs.map((value) => {
+          const valueObject = value.toObject();
+          const likesCount = valueObject?.likes?.length || 0;
+          delete valueObject.likes
+          return {...valueObject, likesCount}
+         })
          res.status(200).json({
             success: true, 
-            data: {blogs},
+            data: {blogs: blogWithLikes},
             message: "Blogs found successfully"
          })
 
     } catch(err) {
+        console.log(err)
         res.status(500).json({
             success: false,
             message: "Internal server error"
@@ -53,18 +60,12 @@ const getBlogs = async (req, res) => {
 const getBlogById = async (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")?.[1];
-    console.log("api hit")
     const userId = extractUserId(token); // assumed to return a string
-    console.log("userId", userId)
     const { blogId, wantOnlyUserId } = req.params;
     const blogIdObj = new mongoose.Types.ObjectId(blogId);
    let userIdObj = null;
-   try {
-     userIdObj = mongoose.Types.ObjectId(userId);
-   } catch {
-     userIdObj = null;
-   }
-
+   if(userId)
+     userIdObj = new mongoose.Types.ObjectId(userId);
     const fieldsToProject =
       wantOnlyUserId === "true"
         ? { _id: "$userInfo._id" }
@@ -187,13 +188,12 @@ const handleLike = async (req, res) => {
             blog?.likes?.push(userId);
         }
         await blog.save()
-        console.log(userId, blog.likes);
-        console.log(blog.likes.includes(userId))
         res.status(200).json({
             success: true,
-            message: "success"
+            message: isAlreadyLiked ? "Unliked blog successfully" : "Liked blog successfully"
         })
     } catch(err) {
+        console.log(err)
         return res.status(500).json({
             success: false,
             message: "Internal server error"

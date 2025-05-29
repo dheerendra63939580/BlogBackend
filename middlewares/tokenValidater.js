@@ -13,12 +13,10 @@ const tokenValidation = async (req, res, next) => {
                 sucess: false,
                 message: "Invalid token"
             });
-            console.log("decoded", decoded)
             req.userId = decoded?.data?.id;
             next()
         });  
     } catch(err) {
-        console.log("failing here", err)
         res.status(500).json({
             sucess: false,
             message: "Internal server error"
