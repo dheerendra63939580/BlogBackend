@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { countryNameEnum } = require("../utils/constant/countryNameEnum");
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -14,11 +15,18 @@ const userSchema = new mongoose.Schema({
         type: String
     },
     country: {
-        type: String
+        type: String,
+        enum: countryNameEnum
     },
-    isVerified: {
+    isGmailVerified: {
         type: Boolean,
         default: false
+    },
+    verificationToken: {
+        type: String
+    },
+    verificationTokenExpiry: {
+        type: Number
     },
     googleId: {
         type: String,

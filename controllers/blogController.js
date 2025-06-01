@@ -108,7 +108,7 @@ const getBlogById = async (req, res) => {
           updatedAt: 1,
           likesCount: 1,
           hasUserLiked: 1,
-          user: fieldsToProject,
+          userId: fieldsToProject,
         },
       },
     ]);
@@ -201,10 +201,40 @@ const handleLike = async (req, res) => {
     }
 }
 
+const deleteBlog = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const {blogId} = req.params;
+    const blog = await Blog.findById(blogId);
+    if(!blog)
+      return res.status(400).json({
+        success: false,
+        message: "Blog not found"
+      })
+    if(blog?.userId.toString() !== userId)
+      return res.status(400).json({
+        success: false,
+        message: "Unauthorized access"
+    })
+    await Blog.findByIdAndDelete(blogId)
+    return res.status(200).json({
+      success: true,
+      message: "Blog deleted successfully"
+    })
+  } catch(err) {
+    console.log(err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    })
+  }
+}
+
 module.exports = {
     createBlog,
     getBlogs,
     getBlogById,
     updateBlog,
-    handleLike
+    handleLike,
+    deleteBlog
 }

@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors")
 const userRouter = require("./route/userRouter")
 const blogRouter = require("./route/blogRouter")
+const commentRouter = require("./route/commentRouter")
 
 const port = process.env.PORT || 3000
 const app = express()
@@ -11,7 +12,9 @@ app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 app.use(cors())
 app.use("/api/v1/user/", userRouter);
-app.use("/api/v1/", blogRouter)
+app.use("/api/v1/", blogRouter);
+// app.use("/api/v1/blog", commentRouter)
+// comment functionality will be implemented later.
 
 
 

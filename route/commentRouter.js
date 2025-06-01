@@ -2,7 +2,9 @@ const express = require("express");
 const { createComment } = require("../controllers/commentController");
 const { tokenValidation } = require("../middlewares/tokenValidater");
 
-const route = express.Router();
+const router = express.Router();
 
-route.route("/comment")
+router.route("/comment")
     .post(tokenValidation, createComment)
+
+module.exports = router;
