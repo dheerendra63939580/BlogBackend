@@ -17,8 +17,6 @@ const createBlog = async (req, res) => {
             title,
             content
         });
-        user.blogs.push(blog._id);
-        await user.save()
         res.status(201).json({
             success: true,
             message: "Blog created successfully"

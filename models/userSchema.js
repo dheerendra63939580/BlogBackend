@@ -34,10 +34,6 @@ const userSchema = new mongoose.Schema({
     avatar: {
         type: String
     },
-    blogs: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Blog"
-    }],
 }, {timestamps: true})
 
 const User = mongoose.model("User", userSchema)
