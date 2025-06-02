@@ -20,7 +20,7 @@ const sendEmailVerificationToken = async (userEmail, verificationToken) => {
     
             Thank you for registering. Please verify your email by clicking the link below:
     
-            http://localhost:3000/api/v1/user/verify-email/${verificationToken}
+            https://blogbackend-njk4.onrender.com/api/v1/user/verify-email/${verificationToken}
     
             If you did not request this, please ignore this email.
     
@@ -29,7 +29,7 @@ const sendEmailVerificationToken = async (userEmail, verificationToken) => {
             html: `
             <p>Hello,</p>
             <p>Thank you for registering. Please verify your email by clicking the link below:</p>
-            <p><a href="http://localhost:3000/api/v1/user/verify-email/${verificationToken}" target="_blank">Verify Email</a></p>
+            <p><a href="https://blogbackend-njk4.onrender.com/api/v1/user/verify-email/${verificationToken}" target="_blank">Verify Email</a></p>
             <p>If you did not request this, please ignore this email.</p>
             <p>Best regards,<br>Blog</p>
             `
