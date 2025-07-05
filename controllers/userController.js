@@ -20,7 +20,7 @@ const signInByGoogle = async (req, res) => {
                 success: false,
                 message: "Invalid client id"
         })
-        const isUserExist = await User.findOne({googleId: userData.sub});
+        const isUserExist = await User.findOne({$or: [{googleId: userData.sub}, {email: userData.email}]});
         if(isUserExist) {
             const token = signToken(isUserExist.email, isUserExist._id, userData.exp);
             return res.status(200).json({
