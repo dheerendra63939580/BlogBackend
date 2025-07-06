@@ -7,7 +7,7 @@ const bcrypt = require("bcrypt")
 const saltRounds = process.env.SALT_ROUND
 
 const signInByGoogle = async (req, res) => {
-    const {userToken} = req.body;
+    const {userToken, country} = req.body;
     try {
         const userData = await verifyGoogleToken(userToken);
         if(!userData)
@@ -35,6 +35,7 @@ const signInByGoogle = async (req, res) => {
             googleId: userData.sub,
             avatar: userData.picture,
             isVerified: true,
+            country,
 
         })
         const token = signToken(user.email, user._id, userData.exp);

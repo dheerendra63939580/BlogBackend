@@ -33,7 +33,7 @@ const getBlogs = async (req, res) => {
     try {
          const blogs = await Blog.find({})
          .select("-content")
-         .populate("userId", "name createdAt updatedAt avatar _id");
+         .populate("userId", "name createdAt updatedAt avatar _id country");
          const blogWithLikes = blogs.map((value) => {
           const valueObject = value.toObject();
           const likesCount = valueObject?.likes?.length || 0;
@@ -73,6 +73,7 @@ const getBlogById = async (req, res) => {
             avatar: "$userInfo.avatar",
             createdAt: "$userInfo.createdAt",
             updatedAt: "$userInfo.updatedAt",
+            country: "$userInfo.country"
           };
 
     const result = await Blog.aggregate([
