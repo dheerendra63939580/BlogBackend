@@ -30,8 +30,9 @@ const createBlog = async (req, res) => {
 }
 
 const getBlogs = async (req, res) => {
+  const {page, limit} = req.query;
     try {
-         const blogs = await Blog.find({})
+         const blogs = await Blog.find({}).skip((page - 1) * limit).limit(limit)
          .select("-content")
          .populate("userId", "name createdAt updatedAt avatar _id country");
          const blogWithLikes = blogs.map((value) => {
@@ -40,9 +41,10 @@ const getBlogs = async (req, res) => {
           delete valueObject.likes
           return {...valueObject, likesCount}
          })
+         const total = await Blog.countDocuments()
          res.status(200).json({
             success: true, 
-            data: {blogs: blogWithLikes},
+            data: {blogs: blogWithLikes, total },
             message: "Blogs found successfully"
          })
 

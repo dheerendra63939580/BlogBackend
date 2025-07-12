@@ -29,6 +29,11 @@ const signInByGoogle = async (req, res) => {
                 message: "Logged in successfully"
             })
         }
+        if(!isUserExist && !country)
+            return res.status(400).json({
+                success: false,
+                message: "Account does not exist. Please sign up."
+            })
         const user = await User.create({
             name: userData.name,
             email: userData.email,
